@@ -1,50 +1,132 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QLineEdit, QPushButton
+import sys
+from PyQt5.QtWidgets import (
+    QApplication, QWidget, QLabel, QVBoxLayout, QLineEdit, QPushButton,
+    QMainWindow, QMessageBox, QWidget, QLabel, QHBoxLayout, QGridLayout, QMenuBar, QAction, QSizePolicy
+)
 from PyQt5.QtGui import QFont, QPalette, QLinearGradient, QColor, QBrush
 from PyQt5.QtCore import Qt
+from PyQt5.uic import loadUi
 
-app = QApplication([])
 
-window = QWidget()
-window.setWindowTitle("Login")
-window.setFixedSize(400, 300)
+class LoginScreen(QWidget):
+    def __init__(self):
+        super(LoginScreen, self).__init__()
+        self.setWindowTitle("Login")
+        self.setMinimumSize(400,300)
 
-# Background gradient
-palette = QPalette()
-gradient = QLinearGradient(0, 0, 400, 300)
-gradient.setColorAt(0.0, QColor("#a2d4f5"))
-gradient.setColorAt(1.0, QColor("#ffffff"))
-palette.setBrush(QPalette.Window, QBrush(gradient))
-window.setPalette(palette)
-window.setAutoFillBackground(True)
+        # Background gradient
+        palette = QPalette()
+        gradient = QLinearGradient(0, 0, 800, 600)
+        gradient.setColorAt(0.0, QColor("#a2d4f5"))
+        gradient.setColorAt(1.0, QColor("#ffffff"))
+        palette.setBrush(QPalette.Window, QBrush(gradient))
+        self.setPalette(palette)
+        self.setAutoFillBackground(True)
 
-layout = QVBoxLayout()
+        layout = QVBoxLayout()
 
-# Logo / Judul
-logo = QLabel("PhvSi")
-logo.setAlignment(Qt.AlignCenter)
-logo_font = QFont("Arial", 48, QFont.Bold)
-logo.setFont(logo_font)
-logo.setMinimumHeight(70)  # ✨ Tambahkan tinggi minimum
-logo.setStyleSheet("color: black;")
+        # Logo
+        logo = QLabel("PhySim")
+        logo.setAlignment(Qt.AlignCenter)
+        logo_font = QFont("Arial", 48, QFont.Bold)
+        logo.setFont(logo_font)
+        logo.setMinimumHeight(70)
+        logo.setStyleSheet("color: black;")
+        layout.addWidget(logo)
 
-layout.addWidget(logo)
+        # Input fields
+        self.nim = QLineEdit()
+        self.nim.setPlaceholderText("NTM")
+        layout.addWidget(self.nim)
 
-# NIM input
-nim = QLineEdit()
-nim.setPlaceholderText("NTM")
-layout.addWidget(nim)
+        self.password = QLineEdit()
+        self.password.setPlaceholderText("PASSWORD")
+        self.password.setEchoMode(QLineEdit.Password)
+        layout.addWidget(self.password)
 
-# Password input
-password = QLineEdit()
-password.setPlaceholderText("PASSWORD")
-password.setEchoMode(QLineEdit.Password)
-layout.addWidget(password)
+        # Login button
+        login_btn = QPushButton("LOGIN")
+        login_btn.setStyleSheet("background-color: #00aaff; color: white; padding: 6px 12px; border-radius: 6px;")
+        login_btn.clicked.connect(self.check_login)
+        layout.addWidget(login_btn, alignment=Qt.AlignCenter)
 
-# Login button
-login_btn = QPushButton("LOGIN")
-login_btn.setStyleSheet("background-color: #00aaff; color: white; padding: 6px 12px; border-radius: 6px;")
-layout.addWidget(login_btn, alignment=Qt.AlignCenter)
+        self.setLayout(layout)
 
-window.setLayout(layout)
-window.show()
-app.exec_()
+    def check_login(self):
+        if self.nim.text() == "H1A024xxx" and self.password.text() == "kel20":
+            self.menu = Menu()
+            self.menu.show()
+            self.close()  # tutup login window
+        else:
+            QMessageBox.warning(self, "Login Failed", "NIM atau password salah.")
+
+class Menu(QMainWindow):
+    def __init__(self):
+        super(Menu, self).__init__()
+        self.setWindowTitle("PhySim - Menu")
+        self.resize(800, 600)
+
+        # Menu bar
+        menubar = self.menuBar()
+        account_menu = menubar.addMenu("Account")
+        logout_action = QAction("Logout", self)
+        logout_action.setObjectName("actionLogout")
+        account_menu.addAction(logout_action)
+
+        # Connect logout action (replace with your logic)
+        logout_action.triggered.connect(self.handle_logout)
+
+        # Background gradient
+        palette = QPalette()
+        gradient = QLinearGradient(0, 0, 800, 600)
+        gradient.setColorAt(0.0, QColor("#a2d4f5"))
+        gradient.setColorAt(1.0, QColor("#ffffff"))
+        palette.setBrush(QPalette.Window, QBrush(gradient))
+        self.setPalette(palette)
+
+        # Central widget
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+
+        main_layout = QVBoxLayout()
+        central_widget.setLayout(main_layout)
+
+        # Title label
+        title_label = QLabel("CHOOSE THE SIMULATION")
+        title_font = QFont("Arial", 32, QFont.Bold)
+        title_label.setFont(title_font)
+        title_label.setAlignment(Qt.AlignCenter)
+        title_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        main_layout.addWidget(title_label)
+
+        # Button grid
+        button_grid = QGridLayout()
+        buttons = []
+
+        for i in range(6):
+            btn = QPushButton(str(i + 1))
+            btn.setMinimumSize(100, 60)
+            btn.setStyleSheet("background-color: white; border: 1px solid #aaa; border-radius: 8px;")
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            buttons.append(btn)
+            button_grid.addWidget(btn, i // 3, i % 3)
+
+        main_layout.addLayout(button_grid)
+
+    def handle_logout(self):
+        self.login = login_window ()
+        self.login.show()
+        print("Logout clicked")
+        # Replace with: widget.setCurrentWidget(LoginPage()) if you use QStackedWidget
+
+    
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    app.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+    app.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+    login_window = LoginScreen()
+    window = Menu()
+    login_window.show()
+    sys.exit(app.exec_())
